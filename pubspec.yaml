@@ -1,0 +1,25 @@
+name: camera_poc
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  camera: ^0.11.1    
+  gal: ^2.3.1
+  shared_preferences: ^2.5.3
+  gallery_saver_plus: ^3.2.4
+  path_provider: ^2.1.5
+  photo_manager: ^3.6.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
