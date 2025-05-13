@@ -10,7 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class CameraPage extends StatefulWidget {
-  const CameraPage({super.key});
+  final String? savedVideoFileName;
+  const CameraPage({super.key, this.savedVideoFileName});
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -31,7 +32,7 @@ class _CameraPageState extends State<CameraPage> {
   @override
   Widget build(BuildContext context) {
     if (cameraController == null || (cameraController?.value.isInitialized == false)) {
-      return const CircularProgressIndicator();
+      return const Center(child: CircularProgressIndicator());
     } else {
       return Stack(children: [
         CameraPreview(cameraController!),
@@ -81,18 +82,23 @@ class _CameraPageState extends State<CameraPage> {
       if (ticks >= totalTicks) {
         timer.cancel();
         final videoFile = await cameraController!.stopVideoRecording();
-        final renamedFile = await _renameRecordedVideo(videoFile, 'camera_poc_${DateTime.now().toIso8601String()}');
-        await Gal.putVideo(renamedFile.path);
+        final renamedFile = await _renameRecordedVideo(
+            videoFile, widget.savedVideoFileName ?? 'camera_poc_${DateTime.now().toIso8601String()}');
+        //await Gal.putVideo(renamedFile.path);
+
+        //store in app directory
+        // delete temp files
+        //store file name in shared pref
 
         //Delete the temp file to clear cache
-        final file = File(videoFile.path);
-        if (await file.exists()) {
-          await file.delete();
-        }
+        // final file = File(videoFile.path);
+        // if (await file.exists()) {
+        //   await file.delete();
+        // }
 
-        if (await renamedFile.exists()) {
-          await renamedFile.delete();
-        }
+        // if (await renamedFile.exists()) {
+        //   await renamedFile.delete();
+        // }
       }
     });
   }
@@ -105,8 +111,8 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   Future<File> _renameRecordedVideo(XFile originalVideo, String newFileName) async {
-    final directory = await getTemporaryDirectory(); // Or use a persistent dir
-    final newPath = '${directory.path}/$newFileName.mp4';
+    final directory = await getApplicationDocumentsDirectory();
+    final newPath = '${directory.path}/$newFileName';
 
     // Copy with new name
     final renamedFile = await File(originalVideo.path).copy(newPath);
@@ -138,5 +144,15 @@ class _CameraPageState extends State<CameraPage> {
       }
     }
     return null; // Not found
+  }
+
+  Future<File> persistRecordedVideo(XFile recordedVideo, String fileName) async {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final newPath = '${appDocDir.path}/$fileName';
+
+    final newFile = await File(recordedVideo.path).copy(newPath);
+    await File(recordedVideo.path).delete(); // clean up cache
+
+    return newFile;
   }
 }

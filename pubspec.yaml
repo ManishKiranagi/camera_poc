@@ -15,6 +15,7 @@ dependencies:
   gallery_saver_plus: ^3.2.4
   path_provider: ^2.1.5
   photo_manager: ^3.6.4
+  video_player: ^2.9.5  
 
 dev_dependencies:
   flutter_test:
